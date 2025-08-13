@@ -10,7 +10,7 @@ import java.util.List;
 public class Account {
 
     @Id
-    @Column(name = "account_number", nullable = false, length = 32)
+    @Column(name = "account_number", length = 32, nullable = false)
     private String accountNumber;
 
     @Column(nullable = false)
@@ -22,7 +22,7 @@ public class Account {
     @Column(nullable = false)
     private Instant createDate;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Transaction> transactions = new ArrayList<>();
 
     protected Account() { }
@@ -33,47 +33,33 @@ public class Account {
         this.createDate = Instant.now();
     }
 
-    // BONUS: polimorfik işle
+    // BONUS: polimorfik delege
     public synchronized void post(Transaction tx) throws InsufficientBalanceException {
         tx.setAccount(this);
         tx.apply(this);
         this.transactions.add(tx);
     }
 
-    // Testler bunları doğrudan çağırıyor
-    public void deposit(double amount) {
+    // UML'deki isimler: credit/debit
+    public void credit(double amount) {
         if (amount <= 0) return;
         this.balance += amount;
     }
 
-    public void withdraw(double amount) throws InsufficientBalanceException {
+    public void debit(double amount) throws InsufficientBalanceException {
         if (amount <= 0) throw new InsufficientBalanceException("Amount must be positive");
         if (this.balance < amount) throw new InsufficientBalanceException("Insufficient balance");
         this.balance -= amount;
     }
 
-    // Polimorfik çağrılar için iç metotlar
-    public void credit(double amount) { deposit(amount); }
-    public void debit(double amount) throws InsufficientBalanceException { withdraw(amount); }
+    // Testlerde kullanılan isimler (köprü)
+    public void deposit(double amount) { credit(amount); }
+    public void withdraw(double amount) throws InsufficientBalanceException { debit(amount); }
 
-    // getters
     public String getAccountNumber() { return accountNumber; }
     public String getOwner() { return owner; }
     public double getBalance() { return balance; }
     public Instant getCreateDate() { return createDate; }
     public List<Transaction> getTransactions() { return transactions; }
-
-    public void setAccountNumber(String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
-    public void setCreateDate(Instant createDate) {
-        this.createDate = createDate;
-    }
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-    }
     public void setOwner(String owner) { this.owner = owner; }
 }

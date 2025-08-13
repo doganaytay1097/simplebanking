@@ -8,13 +8,8 @@ import javax.persistence.Entity;
 public class DepositTransaction extends Transaction {
 
     protected DepositTransaction() { }
-
-    public DepositTransaction(double amount) {
-        super(amount);
-    }
+    public DepositTransaction(double amount) { super(amount); }
 
     @Override
-    public void apply(Account account) {
-        account.credit(getAmount());
-    }
+    public void apply(Account account) { account.credit(getAmount()); }
 }

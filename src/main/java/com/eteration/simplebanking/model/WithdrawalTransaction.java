@@ -8,10 +8,7 @@ import javax.persistence.Entity;
 public class WithdrawalTransaction extends Transaction {
 
     protected WithdrawalTransaction() { }
-
-    public WithdrawalTransaction(double amount) {
-        super(amount);
-    }
+    public WithdrawalTransaction(double amount) { super(amount); }
 
     @Override
     public void apply(Account account) throws InsufficientBalanceException {

@@ -14,15 +14,12 @@ public abstract class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // UML: +date
     @Column(nullable = false)
     private Instant date;
 
-    // UML: +amount
     @Column(nullable = false)
     private double amount;
 
-    // Ödevin REST çıktısı için gerekli
     @Column(nullable = false, length = 64)
     private String approvalCode;
 
@@ -30,19 +27,36 @@ public abstract class Transaction {
     @JoinColumn(name = "account_number")
     private Account account;
 
-    protected Transaction() { }
-
-    // UML: Transaction(double)
-    public Transaction(double amount) {
-        this.amount = amount;
+    // 🔧 Jackson bu ctor'u kullanır; approvalCode ve date boş kalmasın diye burada üretiyoruz
+    protected Transaction() {
         this.date = Instant.now();
         this.approvalCode = UUID.randomUUID().toString();
     }
 
-    // BONUS: polimorfik uygulama
+    public Transaction(double amount) {
+        this(amount, Instant.now(), UUID.randomUUID().toString());
+    }
+
+    // yardımcı (iç) ctor — test/başka ihtiyaçlar için
+    protected Transaction(double amount, Instant date, String approvalCode) {
+        this.amount = amount;
+        this.date = date;
+        this.approvalCode = approvalCode;
+    }
+
     public abstract void apply(Account account) throws InsufficientBalanceException;
 
-    // UML: toString()
+    // ✅ Jackson için gerekli setter
+    public void setAmount(double amount) { this.amount = amount; }
+
+    // zaten vardı
+    public Long getId() { return id; }
+    public Instant getDate() { return date; }
+    public double getAmount() { return amount; }
+    public String getApprovalCode() { return approvalCode; }
+    public Account getAccount() { return account; }
+    public void setAccount(Account account) { this.account = account; }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() +
@@ -51,12 +65,4 @@ public abstract class Transaction {
                 ", approvalCode='" + approvalCode + '\'' +
                 '}';
     }
-
-    // --- Getter/Setter ---
-    public Long getId() { return id; }
-    public Instant getDate() { return date; }
-    public double getAmount() { return amount; }
-    public String getApprovalCode() { return approvalCode; }
-    public Account getAccount() { return account; }
-    public void setAccount(Account account) { this.account = account; }
 }

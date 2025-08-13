@@ -1,20 +1,20 @@
 package com.eteration.simplebanking.controller;
 
 import com.eteration.simplebanking.dto.BillPaymentRequest;
-import com.eteration.simplebanking.model.BillPaymentTransaction;
-import com.eteration.simplebanking.model.Account;
-import com.eteration.simplebanking.model.InsufficientBalanceException;
-import com.eteration.simplebanking.model.DepositTransaction;
-import com.eteration.simplebanking.model.WithdrawalTransaction;
+import com.eteration.simplebanking.model.*;
 import com.eteration.simplebanking.services.AccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Tag(name = "Accounts", description = "Account retrieval and money operations")
 @RestController
 @RequestMapping("/account/v1")
+@Validated
 public class AccountController {
 
     private final AccountService service;
@@ -47,14 +47,22 @@ public class AccountController {
         return ResponseEntity.ok(new TransactionStatus("OK", trx.getApprovalCode()));
     }
 
-    @Operation(summary = "Pay a bill (debit via BillPaymentTransaction)")
+    @Operation(summary = "Pay a bill (BillPaymentTransaction)")
     @PostMapping("/bill-payment/{accountNumber}")
     public ResponseEntity<TransactionStatus> billPayment(@PathVariable String accountNumber,
-                                                         @RequestBody BillPaymentRequest body)
+                                                         @Valid @RequestBody BillPaymentRequest body)
             throws InsufficientBalanceException {
         Account account = service.findAccount(accountNumber);
-        BillPaymentTransaction tx = new BillPaymentTransaction(body.getPayee(), body.getAmount());
-        account.post(tx); // BONUS: polimorfik işlem
+        BillPaymentTransaction tx =
+                new BillPaymentTransaction(body.getPayee(), body.getAmount());
+        account.post(tx);
         return ResponseEntity.ok(new TransactionStatus("OK", tx.getApprovalCode()));
+    }
+
+    // Demo amaçlı hesap oluşturma
+    @PostMapping("/create/{accountNumber}")
+    public ResponseEntity<Account> create(@PathVariable String accountNumber,
+                                          @RequestParam String owner) {
+        return ResponseEntity.ok(service.create(owner, accountNumber));
     }
 }

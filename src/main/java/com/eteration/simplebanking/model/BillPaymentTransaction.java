@@ -12,9 +12,9 @@ public class BillPaymentTransaction extends Transaction {
     @Column(nullable = false)
     private String payee;
 
-    protected BillPaymentTransaction() { }
+    protected BillPaymentTransaction() {
+    }
 
-    // UML: BillPaymentTransaction(...)
     public BillPaymentTransaction(String payee, double amount) {
         super(amount);
         this.payee = payee;
@@ -26,8 +26,8 @@ public class BillPaymentTransaction extends Transaction {
     }
 
     public String getPayee() { return payee; }
+    public void setPayee(String payee) { this.payee = payee; }
 
-    // UML: toString()
     @Override
     public String toString() {
         return super.toString().replace("}", ", payee='" + payee + "'}");
