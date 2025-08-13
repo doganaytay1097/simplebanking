@@ -63,5 +63,17 @@ public class Account {
     public Instant getCreateDate() { return createDate; }
     public List<Transaction> getTransactions() { return transactions; }
 
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+    public void setCreateDate(Instant createDate) {
+        this.createDate = createDate;
+    }
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
     public void setOwner(String owner) { this.owner = owner; }
 }
