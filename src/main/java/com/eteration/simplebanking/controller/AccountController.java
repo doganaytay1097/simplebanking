@@ -1,5 +1,7 @@
 package com.eteration.simplebanking.controller;
 
+import com.eteration.simplebanking.dto.BillPaymentRequest;
+import com.eteration.simplebanking.model.BillPaymentTransaction;
 import com.eteration.simplebanking.model.Account;
 import com.eteration.simplebanking.model.InsufficientBalanceException;
 import com.eteration.simplebanking.model.DepositTransaction;
@@ -43,5 +45,16 @@ public class AccountController {
         Account account = service.findAccount(accountNumber);
         account.post(trx);
         return ResponseEntity.ok(new TransactionStatus("OK", trx.getApprovalCode()));
+    }
+
+    @Operation(summary = "Pay a bill (debit via BillPaymentTransaction)")
+    @PostMapping("/bill-payment/{accountNumber}")
+    public ResponseEntity<TransactionStatus> billPayment(@PathVariable String accountNumber,
+                                                         @RequestBody BillPaymentRequest body)
+            throws InsufficientBalanceException {
+        Account account = service.findAccount(accountNumber);
+        BillPaymentTransaction tx = new BillPaymentTransaction(body.getPayee(), body.getAmount());
+        account.post(tx); // BONUS: polimorfik işlem
+        return ResponseEntity.ok(new TransactionStatus("OK", tx.getApprovalCode()));
     }
 }

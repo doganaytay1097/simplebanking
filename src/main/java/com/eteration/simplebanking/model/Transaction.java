@@ -14,12 +14,15 @@ public abstract class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // UML: +date
     @Column(nullable = false)
     private Instant date;
 
+    // UML: +amount
     @Column(nullable = false)
     private double amount;
 
+    // Ödevin REST çıktısı için gerekli
     @Column(nullable = false, length = 64)
     private String approvalCode;
 
@@ -29,15 +32,27 @@ public abstract class Transaction {
 
     protected Transaction() { }
 
+    // UML: Transaction(double)
     public Transaction(double amount) {
         this.amount = amount;
         this.date = Instant.now();
         this.approvalCode = UUID.randomUUID().toString();
     }
 
+    // BONUS: polimorfik uygulama
     public abstract void apply(Account account) throws InsufficientBalanceException;
 
-    // getters/setters
+    // UML: toString()
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() +
+                "{date=" + date +
+                ", amount=" + amount +
+                ", approvalCode='" + approvalCode + '\'' +
+                '}';
+    }
+
+    // --- Getter/Setter ---
     public Long getId() { return id; }
     public Instant getDate() { return date; }
     public double getAmount() { return amount; }
