@@ -1,18 +1,43 @@
 package com.eteration.simplebanking.controller;
 
+import com.eteration.simplebanking.dto.TransactionResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TransactionStatus {
-    private String status;
+
+
+    @JsonIgnore
+    private TransactionResult result;
+
     private String approvalCode;
 
     public TransactionStatus() { }
 
-    public TransactionStatus(String status, String approvalCode) {
-        this.status = status;
+    public TransactionStatus(TransactionResult result, String approvalCode) {
+        this.result = result;
         this.approvalCode = approvalCode;
     }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getApprovalCode() { return approvalCode; }
-    public void setApprovalCode(String approvalCode) { this.approvalCode = approvalCode; }
+
+    @JsonProperty("status")
+    public String getStatus() {
+        return result != null ? result.name() : null;
+    }
+
+    public TransactionResult getResult() {
+        return result;
+    }
+
+    public void setResult(TransactionResult result) {
+        this.result = result;
+    }
+
+    public String getApprovalCode() {
+        return approvalCode;
+    }
+
+    public void setApprovalCode(String approvalCode) {
+        this.approvalCode = approvalCode;
+    }
 }
