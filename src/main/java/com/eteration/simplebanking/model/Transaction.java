@@ -1,5 +1,7 @@
 package com.eteration.simplebanking.model;
 
+import com.eteration.simplebanking.exception.InsufficientBalanceException;
+
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -25,7 +27,7 @@ public abstract class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_number")
-    private Account account;
+    private BankAccount bankAccount;
 
     // 🔧 Jackson bu ctor'u kullanır; approvalCode ve date boş kalmasın diye burada üretiyoruz
     protected Transaction() {
@@ -44,7 +46,7 @@ public abstract class Transaction {
         this.approvalCode = approvalCode;
     }
 
-    public abstract void apply(Account account) throws InsufficientBalanceException;
+    public abstract void apply(BankAccount bankAccount) throws InsufficientBalanceException;
 
     // ✅ Jackson için gerekli setter
     public void setAmount(double amount) { this.amount = amount; }
@@ -54,8 +56,8 @@ public abstract class Transaction {
     public Instant getDate() { return date; }
     public double getAmount() { return amount; }
     public String getApprovalCode() { return approvalCode; }
-    public Account getAccount() { return account; }
-    public void setAccount(Account account) { this.account = account; }
+    public BankAccount getAccount() { return bankAccount; }
+    public void setAccount(BankAccount bankAccount) { this.bankAccount = bankAccount; }
 
     @Override
     public String toString() {

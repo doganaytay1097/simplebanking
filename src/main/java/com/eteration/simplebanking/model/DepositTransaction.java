@@ -11,5 +11,5 @@ public class DepositTransaction extends Transaction {
     public DepositTransaction(double amount) { super(amount); }
 
     @Override
-    public void apply(Account account) { account.credit(getAmount()); }
+    public void apply(BankAccount bankAccount) { bankAccount.credit(getAmount()); }
 }

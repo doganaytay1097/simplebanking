@@ -1,5 +1,7 @@
 package com.eteration.simplebanking.model;
 
+import com.eteration.simplebanking.exception.InsufficientBalanceException;
+
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -21,8 +23,8 @@ public class BillPaymentTransaction extends Transaction {
     }
 
     @Override
-    public void apply(Account account) throws InsufficientBalanceException {
-        account.debit(getAmount());
+    public void apply(BankAccount bankAccount) throws InsufficientBalanceException {
+        bankAccount.debit(getAmount());
     }
 
     public String getPayee() { return payee; }

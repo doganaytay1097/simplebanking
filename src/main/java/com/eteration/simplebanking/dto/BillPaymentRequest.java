@@ -2,12 +2,13 @@ package com.eteration.simplebanking.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import static com.eteration.simplebanking.constants.ErrorMessages.*;
 
 public class BillPaymentRequest {
-    @NotBlank(message = "payee is required")
+    @NotBlank(message = PAYEE_REQUIRED)
     private String payee;
 
-    @Positive(message = "amount must be positive")
+    @Positive(message = AMOUNT_MUST_BE_POSITIVE)
     private double amount;
 
     public String getPayee() { return payee; }

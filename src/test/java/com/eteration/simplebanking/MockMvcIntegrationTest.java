@@ -1,7 +1,7 @@
 // src/test/java/com/eteration/simplebanking/MockMvcIntegrationTest.java
 package com.eteration.simplebanking;
 
-import com.eteration.simplebanking.services.AccountService;
+import com.eteration.simplebanking.services.BankAccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MockMvcIntegrationTest {
 
     @Autowired MockMvc mvc;
-    @Autowired AccountService service;
+    @Autowired
+    BankAccountService service;
 
     private final String accNo = "669-7788";
 
     @BeforeEach
     void init() {
-        // Her testten önce temiz bir hesap
+
         service.create("Kerem Karaca", accNo);
     }
 
