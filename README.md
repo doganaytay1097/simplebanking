@@ -3,7 +3,7 @@
 Basit bir bankacılık servisi — hesap oluşturma, para yatırma (`credit`) ve çekme (`debit`) işlemlerini REST API üzerinden yönetir.
 
 ## 🚀 Teknolojiler
-- Java 11 / 17
+- Java 11 
 - Spring Boot 2.5.6 (Web, Data JPA, Validation)
 - H2 Database (in-memory)
 - Swagger UI (API dokümantasyonu)
