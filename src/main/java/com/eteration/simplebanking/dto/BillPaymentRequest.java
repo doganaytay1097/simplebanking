@@ -21,7 +21,7 @@ public class BillPaymentRequest {
     @Size(max = 20, message = PHONE_NUMBER_REQUIRED)
     private String phoneNumber;
 
-    // getters & setters
+
     public String getPayee() { return payee; }
     public void setPayee(String payee) { this.payee = payee; }
 

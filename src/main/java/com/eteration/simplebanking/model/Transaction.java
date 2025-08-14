@@ -31,7 +31,6 @@ public abstract class Transaction {
     @JsonIgnore
     private BankAccount bankAccount;
 
-    // 🔧 Jackson bu ctor'u kullanır; approvalCode ve date boş kalmasın diye burada üretiyoruz
     protected Transaction() {
         this.date = Instant.now();
         this.approvalCode = UUID.randomUUID().toString();
@@ -41,7 +40,7 @@ public abstract class Transaction {
         this(amount, Instant.now(), UUID.randomUUID().toString());
     }
 
-    // yardımcı (iç) ctor — test/başka ihtiyaçlar için
+
     protected Transaction(double amount, Instant date, String approvalCode) {
         this.amount = amount;
         this.date = date;
@@ -50,10 +49,8 @@ public abstract class Transaction {
 
     public abstract void apply(BankAccount bankAccount) throws InsufficientBalanceException;
 
-    // ✅ Jackson için gerekli setter
     public void setAmount(double amount) { this.amount = amount; }
 
-    // zaten vardı
     public Long getId() { return id; }
     public Instant getDate() { return date; }
     public double getAmount() { return amount; }

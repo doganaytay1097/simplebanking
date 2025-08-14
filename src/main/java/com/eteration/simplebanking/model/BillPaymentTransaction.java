@@ -10,11 +10,11 @@ import javax.persistence.Entity;
 @DiscriminatorValue("BillPaymentTransaction")
 public class BillPaymentTransaction extends Transaction {
 
-    // ❌ @Column(nullable = false) -> ✅ nullable bırak (SINGLE_TABLE için şart)
+
     @Column
     private String payee;
 
-    // ❌ @Column(nullable = false, length = 20) -> ✅ sadece length
+
     @Column(length = 20)
     private String phoneNumber;
 

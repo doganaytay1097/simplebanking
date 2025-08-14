@@ -1,107 +1,73 @@
-# Getting Started with Simple Banking (Estimated duration 1-3 hours)
+# SimpleBanking
 
-In this assignment you will build a banking bankAccountService that can handle any number of transactions for bank accounts. The bankAccountService is part of a larger collection of services that model the inner workings of a bank. The services for the "bank bankAccount" provide a simple model of how bank accounts might work in an overly simplified world.
+Basit bir bankacılık servisi — hesap oluşturma, para yatırma (`credit`) ve çekme (`debit`) işlemlerini REST API üzerinden yönetir.
 
-For this assignment, the bank bankAccount is exclusively interested in maintaining the name of the bankAccount owner, the number of the bankAccount and the bankAccount’s balance. The endpoints will be limited to methods that provide a means of crediting and debiting the bankAccount. 
+## 🚀 Teknolojiler
+- Java 11 / 17
+- Spring Boot 2.5.6 (Web, Data JPA, Validation)
+- H2 Database (in-memory)
+- Swagger UI (API dokümantasyonu)
+- Gradle
 
-Your data model for the bank bankAccount object must have fields owner where the field type is java.lang.String, fields to hold the bankAccount number (String) and balance (double). the credit() bankAccountService as specified above adds the supplied amount to the receiving BankAccounts balance and the the debit() bankAccountService subtracts the supplied amount from the receiving BankAccounts balance.  
+---
 
-The object model for our banking system must include transaction objects. A transaction object keeps track of the kind of transaction (deposit, withdrawal, payments etc.) as well as the date and amount of the transaction. Each transaction type will require its own parameters. The following diagram shows how BankAccounts and Transactions are related. An instance of DepositTransaction represents a deposit; a WithdrawalTransaction represents a withdrawal (the triangle on the diagram indicates inheritance). Inheritance for the PhoneBillPaymentTransaction, CheckTransaction etc. is not shown - you must decide where to put this class.  All transactions must have  have the fields date and amount at a minimum. The date field should contain the time of the transaction and should be automatically calculated.
+## 📦 Projeyi Çalıştırma
 
-![model](images/model.png)
+### 1️⃣ Lokal Çalıştırma (Gradle ile)
+```bash
+# Testleri çalıştır
+./gradlew clean test
 
-## You can use provided project template as a start
-The template project (gradle Java) is available under the src folder.  We recommend that you use Quarkus or Spring(boot), Junit, JPA as the primary choices for your implementation.
+# JAR oluştur (testleri atlayarak)
+./gradlew clean bootJar -x test
 
-## Task 1: Implement and test the model
-These transaction objects will be used both to make financial requests of a BankAccount and to keep a record of those requests. The following Unit test segment indicates how transactions will be used on the bankAccountService side:
+# Uygulamayı başlat
+java -jar build/libs/*.jar
+```
 
-    BankAccount bankAccount = new BankAccount("Jim", 12345);
-    bankAccount.post(new DepositTransaction(1000));
-    bankAccount.post(new WithdrawalTransaction(200));
-    bankAccount.post(new PhoneBillPaymentTransaction("Vodafone", "5423345566", 96.50));
-    assertEquals(bankAccount.getBalance(), 703.50, 0.0001)
+- Uygulama `http://localhost:8080` adresinde çalışır.
+- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-### BONUS Task 1: Find a better implementation alternative
-The bank bankAccount post method must do something special for each Transaction type. e.g. post(DepositTransaction) and post(WithdrawalTransaction. This solution will work but creating families of overloaded methods is discouraged as it causes problems with maintenance. Consider, if we added more Transaction subclasses we would need to keep changing the BankAccount class, overloading even more post methods. It is considered bad form in OO  to write case statements based on the type of objects. It also has the same maintenance problems as the first solution. Adding more Transaction subclasses would require changes. Find a solution to delegate the operation using polymorphism so that the Bank bankAccount is never changed by introducing new transaction types. At a öinimum you shoudl make the provided uni test to run:
+---
 
+### 2️⃣ Docker ile Çalıştırma
+Önce JAR oluştur:
+```bash
+./gradlew clean bootJar -x test
+```
 
-## Task 2:  Provide a REST API using Spring Rest Controllers and TEST
-Provide a REST API to the banking system as follows. The following code demonstrates how BankAccounts might be used.  Use services and repositories to persist your model above into a Database using JPA.  Please provide tests (MOCK or othrewise) for your code:
+Docker image oluştur ve çalıştır:
+```bash
+docker build -t simplebanking:latest .
+docker run -p 8080:8080 simplebanking:latest
+```
 
-To deposit money into an bankAccount, one would use:
+---
 
-    curl --location --request POST 'http://localhost:8080/bankAccount/v1/credit/669-7788' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' \
-    --data-raw '    {
-            "amount": 1000.0
-        }'
+## 🧪 Testler
+Tüm testleri çalıştırmak için:
+```bash
+./gradlew clean test
+```
+Testler **MockMvc entegrasyon testleri** içerir ve API uç noktalarının doğru çalıştığını doğrular.
 
-    response would be (200):
-    {
-        "status": "OK",
-        "approvalCode": "67f1aada-637d-4469-a650-3fb6352527ba"
-    }
+---
 
-To withdraw money:
+## 📚 Örnek API Kullanımı
 
-    curl --location --request POST 'http://localhost:8080/bankAccount/v1/debit/669-7788' \
-    --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' \
-    --data-raw '    {
-            "amount": 50.0
-        }'
+**Para Yatırma (Credit)**
+```bash
+curl -X POST "http://localhost:8080/account/v1/credit/12345"   -H "Content-Type: application/json"   -d '{"amount": 100}'
+```
 
-    response would be (200):
-    {
-        "status": "OK",
-        "approvalCode": "a66cce54-335b-4e46-9b49-05017c4b38dd"
-    }
+**Para Çekme (Debit)**
+```bash
+curl -X POST "http://localhost:8080/account/v1/debit/12345"   -H "Content-Type: application/json"   -d '{"amount": 50}'
+```
 
-To get the current bankAccount data, one would use:
+---
 
-    curl --location --request GET 'http://localhost:8080/bankAccount/v1/669-7788'
-
-    response would be:
-
-    {
-        "accountNumber": "669-7788",
-        "owner": "Kerem Karaca",
-        "balance": 950.0,
-        "createDate": "2020-03-26T06:15:50.550+0000",
-        "transactions": [
-            {
-                "date": "2020-03-26T06:16:03.563+0000",
-                "amount": 1000.0,
-                "type": "DepositTransaction",
-                "approvalCode": "67f1aada-637d-4469-a650-3fb6352527ba"
-            },
-            {
-                "date": "2020-03-26T06:16:35.047+0000",
-                "amount": 50.0,
-                "type": "WithdrawalTransaction",
-                "approvalCode": "a66cce54-335b-4e46-9b49-05017c4b38dd"
-            }
-        ]
-    }
-
-
-## Reference Documentation
-For further reference, please consider the following sections:
-
-* [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/gradle-plugin/reference/html/)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/2.2.5.RELEASE/reference/htmlsingle/#using-boot-devtools)
-
-### Guides
-The following guides illustrate how to use some features concretely:
-
-* [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
-
-### Additional Links
-These additional references should also help you:
-* [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
-
-
-
+## 📌 Notlar
+- H2 veritabanı in-memory çalışır, uygulama kapanınca veri sıfırlanır.
+- Varsayılan H2 konsolu: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+- JDBC URL: `jdbc:h2:mem:bank`

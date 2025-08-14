@@ -18,32 +18,31 @@ import static com.eteration.simplebanking.constants.ErrorMessages.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // --- Domain hataları ---
+
     @ExceptionHandler(InsufficientBalanceException.class)
-    public ResponseEntity<Map<String, String>> insufficient(InsufficientBalanceException e) {
+    public ResponseEntity<Map<String, String>> insufficient(InsufficientBalanceException exception) {
         return build(HttpStatus.BAD_REQUEST,
                 Map.of("status", TransactionResult.DECLINED.name(),
-                        "message", e.getMessage()));
+                        "message", exception.getMessage()));
     }
 
     @ExceptionHandler(AccountAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> accountExists(AccountAlreadyExistsException e) {
+    public ResponseEntity<Map<String, String>> accountExists(AccountAlreadyExistsException exception) {
         return build(HttpStatus.CONFLICT,
                 Map.of("status", TransactionResult.DECLINED.name(),
-                        "message", e.getMessage()));
+                        "message", exception.getMessage()));
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<Map<String, String>> accountNotFound(AccountNotFoundException e) {
+    public ResponseEntity<Map<String, String>> accountNotFound(AccountNotFoundException exception) {
         return build(HttpStatus.NOT_FOUND,
                 Map.of("status", TransactionResult.DECLINED.name(),
-                        "message", e.getMessage()));
+                        "message", exception.getMessage()));
     }
 
-    // --- Validation hataları (Path/Query @Validated) ---
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, String>> invalidParam(ConstraintViolationException e) {
-        String msg = e.getConstraintViolations().stream()
+    public ResponseEntity<Map<String, String>> invalidParam(ConstraintViolationException exception) {
+        String msg = exception.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));
         if (msg.isBlank()) msg = VALIDATION_ERROR;
@@ -53,17 +52,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> illegalArgument(IllegalArgumentException e) {
+    public ResponseEntity<Map<String, String>> illegalArgument(IllegalArgumentException exception) {
         return build(HttpStatus.NOT_FOUND,
                 Map.of("status", TransactionResult.DECLINED.name(),
-                        "message", e.getMessage())); // örn: ACCOUNT_NOT_FOUND
+                        "message", exception.getMessage())); // örn: ACCOUNT_NOT_FOUND
     }
 
-    // --- Validation hataları (RequestBody @Valid) ---
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> invalidBody(MethodArgumentNotValidException e) {
-        String msg = e.getBindingResult().getFieldErrors().stream()
-                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+    public ResponseEntity<Map<String, String>> invalidBody(MethodArgumentNotValidException exception) {
+        String msg = exception.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .findFirst()
                 .orElse(VALIDATION_ERROR);
         return build(HttpStatus.BAD_REQUEST,
@@ -71,33 +70,33 @@ public class GlobalExceptionHandler {
                         "message", msg));
     }
 
-    // --- JSON parse hatası ---
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> badJson(HttpMessageNotReadableException e) {
+    public ResponseEntity<Map<String, String>> badJson(HttpMessageNotReadableException exception) {
         return build(HttpStatus.BAD_REQUEST,
                 Map.of("status", "INVALID_REQUEST",
                         "message", MALFORMED_JSON));
     }
 
-    // --- Veri bütünlüğü (FK/unique vs.) ---
+
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, String>> dataIntegrity(DataIntegrityViolationException e) {
+    public ResponseEntity<Map<String, String>> dataIntegrity(DataIntegrityViolationException exception) {
         return build(HttpStatus.CONFLICT,
                 Map.of("status", TransactionResult.DECLINED.name(),
                         "message", DATA_INTEGRITY_VIOLATION));
     }
 
-    // --- Genel fallback ---
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> general(Exception e) {
-        String msg = (e.getMessage() != null && !e.getMessage().isBlank())
-                ? e.getMessage() : UNEXPECTED_ERROR;
+    public ResponseEntity<Map<String, String>> general(Exception exception) {
+        String msg = (exception.getMessage() != null && !exception.getMessage().isBlank())
+                ? exception.getMessage() : UNEXPECTED_ERROR;
         return build(HttpStatus.INTERNAL_SERVER_ERROR,
                 Map.of("status", TransactionResult.DECLINED.name(),
                         "message", msg));
     }
 
-    // ---- Ortak ResponseEntity kurucu ----
+
     private ResponseEntity<Map<String, String>> build(HttpStatus status, Map<String, String> body) {
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_JSON).body(body);
     }
