@@ -39,18 +39,18 @@ public class BankAccountController {
     @PostMapping("/create/{accountNumber}")
     public ResponseEntity<BankAccount> create(@PathVariable String accountNumber,
                                               @RequestParam String owner) {
-        BankAccount created = bankAccountService.create(owner, accountNumber);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        BankAccount createdBankAccount = bankAccountService.create(owner, accountNumber);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdBankAccount);
     }
 
     @Operation(summary = "Credit (deposit) money to account")
     @PostMapping("/credit/{accountNumber}")
-    @Transactional // yazma transaction
+    @Transactional
     public ResponseEntity<TransactionStatus> credit(@PathVariable String accountNumber,
                                                     @RequestBody DepositTransaction depositTransaction)
             throws InsufficientBalanceException {
-        BankAccount bankAccount = bankAccountService.findAccount(accountNumber); // aynı tx içinde
-        bankAccount.post(depositTransaction); // balance + transactions değişir
+        BankAccount bankAccount = bankAccountService.findAccount(accountNumber);
+        bankAccount.post(depositTransaction);
         return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, depositTransaction.getApprovalCode()));
     }
 
@@ -72,15 +72,14 @@ public class BankAccountController {
                                                          @Valid @RequestBody BillPaymentRequest billPaymentRequest)
             throws InsufficientBalanceException {
 
-        // ✅ Tüm iş serviste: bul, post et, persist et → Transaction döner
-        Transaction tx = bankAccountService.billPayment(
+        Transaction transaction= bankAccountService.billPayment(
                 accountNumber,
                 billPaymentRequest.getPayee(),
                 billPaymentRequest.getAmount(),
                 billPaymentRequest.getPhoneNumber()
         );
 
-        return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, tx.getApprovalCode()));
+        return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, transaction.getApprovalCode()));
     }
 
 }

@@ -15,24 +15,24 @@ public class BankBankAccountControllerExtendedTest {
 
     @Test
     void bill_payment_endpoint_happy_path() throws Exception {
-        // Arrange
+
         BankAccountService service = mock(BankAccountService.class);
         BankAccountController controller = new BankAccountController(service);
 
         BillPaymentRequest req = new BillPaymentRequest();
         req.setPayee("Vodafone");
         req.setAmount(96.5);
-        req.setPhoneNumber("5551234567"); // <-- null değil
+        req.setPhoneNumber("5551234567");
 
         BillPaymentTransaction tx =
                 new BillPaymentTransaction("Vodafone", 96.5, "5551234567");
         when(service.billPayment("X1", "Vodafone", 96.5, "5551234567"))
                 .thenReturn(tx);
 
-        // Act
+
         ResponseEntity<TransactionStatus> resp = controller.billPayment("X1", req);
 
-        // Assert
+
         assertEquals("OK", resp.getBody().getStatus());
         assertNotNull(resp.getBody().getApprovalCode());
         assertEquals(tx.getApprovalCode(), resp.getBody().getApprovalCode());
