@@ -27,7 +27,7 @@ public abstract class Transaction {
     private String approvalCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_number")
+    @JoinColumn(name = "ACCOUNT_NUMBER")
     @JsonIgnore
     private BankAccount bankAccount;
 
