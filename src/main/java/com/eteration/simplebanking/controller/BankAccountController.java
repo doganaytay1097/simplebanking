@@ -7,7 +7,9 @@ import com.eteration.simplebanking.model.*;
 import com.eteration.simplebanking.services.BankAccountService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,54 +22,70 @@ import javax.validation.Valid;
 
 public class BankAccountController {
 
-    private final BankAccountService service;
+    private final BankAccountService bankAccountService;
 
-    public BankAccountController(BankAccountService service) {
-        this.service = service;
+    public BankAccountController(BankAccountService bankAccountService) {
+        this.bankAccountService = bankAccountService;
     }
 
     @Operation(summary = "Get account by number")
     @GetMapping("/{accountNumber}")
     public ResponseEntity<BankAccount> getAccount(@PathVariable String accountNumber) {
-        BankAccount bankAccount = service.findAccount(accountNumber);
+        BankAccount bankAccount = bankAccountService.findAccount(accountNumber);
         return ResponseEntity.ok(bankAccount);
+    }
+
+    @Operation(summary = "Create a bank account")
+    @PostMapping("/create/{accountNumber}")
+    public ResponseEntity<BankAccount> create(@PathVariable String accountNumber,
+                                              @RequestParam String owner) {
+        BankAccount created = bankAccountService.create(owner, accountNumber);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @Operation(summary = "Credit (deposit) money to account")
     @PostMapping("/credit/{accountNumber}")
+    @Transactional // yazma transaction
     public ResponseEntity<TransactionStatus> credit(@PathVariable String accountNumber,
                                                     @RequestBody DepositTransaction depositTransaction)
             throws InsufficientBalanceException {
-        BankAccount bankAccount = service.findAccount(accountNumber);
-        bankAccount.post(depositTransaction);
+        BankAccount bankAccount = bankAccountService.findAccount(accountNumber); // aynı tx içinde
+        bankAccount.post(depositTransaction); // balance + transactions değişir
         return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, depositTransaction.getApprovalCode()));
     }
 
     @Operation(summary = "Debit (withdraw) money from account")
     @PostMapping("/debit/{accountNumber}")
+    @Transactional
     public ResponseEntity<TransactionStatus> debit(@PathVariable String accountNumber,
                                                    @RequestBody WithdrawalTransaction withdrawalTransaction)
             throws InsufficientBalanceException {
-        BankAccount bankAccount = service.findAccount(accountNumber);
+        BankAccount bankAccount = bankAccountService.findAccount(accountNumber);
         bankAccount.post(withdrawalTransaction);
         return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, withdrawalTransaction.getApprovalCode()));
     }
 
     @Operation(summary = "Pay a bill (BillPaymentTransaction)")
     @PostMapping("/bill-payment/{accountNumber}")
+    @Transactional
     public ResponseEntity<TransactionStatus> billPayment(@PathVariable String accountNumber,
                                                          @Valid @RequestBody BillPaymentRequest billPaymentRequest)
             throws InsufficientBalanceException {
-        BankAccount bankAccount = service.findAccount(accountNumber);
-        BillPaymentTransaction billPaymentTransaction =
-                new BillPaymentTransaction(billPaymentRequest.getPayee(), billPaymentRequest.getAmount());
-        bankAccount.post(billPaymentTransaction);
-        return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, billPaymentTransaction.getApprovalCode()));
+
+        // ✅ Tüm iş serviste: bul, post et, persist et → Transaction döner
+        Transaction tx = bankAccountService.billPayment(
+                accountNumber,
+                billPaymentRequest.getPayee(),
+                billPaymentRequest.getAmount(),
+                billPaymentRequest.getPhoneNumber()
+        );
+
+        return ResponseEntity.ok(new TransactionStatus(TransactionResult.OK, tx.getApprovalCode()));
     }
 
-    @PostMapping("/create/{accountNumber}")
-    public ResponseEntity<BankAccount> create(@PathVariable String accountNumber,
-                                              @RequestParam String owner) {
-        return ResponseEntity.ok(service.create(owner, accountNumber));
-    }
 }
+
+
+
+
+

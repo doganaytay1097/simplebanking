@@ -8,12 +8,9 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("WithdrawalTransaction")
 public class WithdrawalTransaction extends Transaction {
-
-    protected WithdrawalTransaction() { }
+    public WithdrawalTransaction() { super(); }
     public WithdrawalTransaction(double amount) { super(amount); }
-
-    @Override
-    public void apply(BankAccount bankAccount) throws InsufficientBalanceException {
-        bankAccount.debit(getAmount());
+    @Override public void apply(BankAccount account) throws InsufficientBalanceException {
+        account.withdraw(getAmount());
     }
 }

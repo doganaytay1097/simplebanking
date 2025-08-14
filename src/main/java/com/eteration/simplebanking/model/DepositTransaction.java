@@ -7,9 +7,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("DepositTransaction")
 public class DepositTransaction extends Transaction {
 
-    protected DepositTransaction() { }
+    public DepositTransaction() { super(); }
     public DepositTransaction(double amount) { super(amount); }
-
-    @Override
-    public void apply(BankAccount bankAccount) { bankAccount.credit(getAmount()); }
+    @Override public void apply(BankAccount account) { account.deposit(getAmount()); }
 }

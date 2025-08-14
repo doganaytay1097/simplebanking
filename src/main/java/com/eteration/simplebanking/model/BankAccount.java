@@ -1,8 +1,6 @@
 package com.eteration.simplebanking.model;
 
 import com.eteration.simplebanking.exception.InsufficientBalanceException;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -11,13 +9,11 @@ import java.util.List;
 import static com.eteration.simplebanking.constants.ErrorMessages.*;
 
 @Entity
-@Table(name = "bank_account")
-@Getter
-@Setter
+@Table(name = "BANK_ACCOUNT")
 public class BankAccount {
 
     @Id
-    @Column(name = "account_number", length = 32, nullable = false)
+    @Column(name = "ACCOUNT_NUMBER", length = 32, nullable = false)
     private String accountNumber;
 
     @Column(nullable = false)
@@ -29,7 +25,7 @@ public class BankAccount {
     @Column(nullable = false)
     private Instant createDate;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Transaction> transactions = new ArrayList<>();
 
     protected BankAccount() { }
@@ -41,10 +37,10 @@ public class BankAccount {
     }
 
 
-    public synchronized void post(Transaction tx) throws InsufficientBalanceException {
-        tx.setAccount(this);
-        tx.apply(this);
-        this.transactions.add(tx);
+    public synchronized void post(Transaction transaction) throws InsufficientBalanceException {
+        transaction.setBankAccount(this);
+        transaction.apply(this);
+        this.transactions.add(transaction);
     }
 
 
@@ -63,4 +59,43 @@ public class BankAccount {
     public void deposit(double amount) { credit(amount); }
     public void withdraw(double amount) throws InsufficientBalanceException { debit(amount); }
 
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public Instant getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Instant createDate) {
+        this.createDate = createDate;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
 }

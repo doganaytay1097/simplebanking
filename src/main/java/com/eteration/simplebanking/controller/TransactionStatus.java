@@ -3,14 +3,10 @@ package com.eteration.simplebanking.controller;
 import com.eteration.simplebanking.dto.TransactionResult;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 public class TransactionStatus {
 
-    // Enum’u içeride "result" olarak tutuyoruz
+
     @JsonIgnore
     private TransactionResult result;
 
@@ -29,4 +25,19 @@ public class TransactionStatus {
         return result != null ? result.name() : null;
     }
 
+    public TransactionResult getResult() {
+        return result;
+    }
+
+    public void setResult(TransactionResult result) {
+        this.result = result;
+    }
+
+    public String getApprovalCode() {
+        return approvalCode;
+    }
+
+    public void setApprovalCode(String approvalCode) {
+        this.approvalCode = approvalCode;
+    }
 }

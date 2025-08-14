@@ -1,10 +1,10 @@
 # Getting Started with Simple Banking (Estimated duration 1-3 hours)
 
-In this assignment you will build a banking service that can handle any number of transactions for bank accounts. The service is part of a larger collection of services that model the inner workings of a bank. The services for the "bank bankAccount" provide a simple model of how bank accounts might work in an overly simplified world.
+In this assignment you will build a banking bankAccountService that can handle any number of transactions for bank accounts. The bankAccountService is part of a larger collection of services that model the inner workings of a bank. The services for the "bank bankAccount" provide a simple model of how bank accounts might work in an overly simplified world.
 
 For this assignment, the bank bankAccount is exclusively interested in maintaining the name of the bankAccount owner, the number of the bankAccount and the bankAccount’s balance. The endpoints will be limited to methods that provide a means of crediting and debiting the bankAccount. 
 
-Your data model for the bank bankAccount object must have fields owner where the field type is java.lang.String, fields to hold the bankAccount number (String) and balance (double). the credit() service as specified above adds the supplied amount to the receiving BankAccounts balance and the the debit() service subtracts the supplied amount from the receiving BankAccounts balance.  
+Your data model for the bank bankAccount object must have fields owner where the field type is java.lang.String, fields to hold the bankAccount number (String) and balance (double). the credit() bankAccountService as specified above adds the supplied amount to the receiving BankAccounts balance and the the debit() bankAccountService subtracts the supplied amount from the receiving BankAccounts balance.  
 
 The object model for our banking system must include transaction objects. A transaction object keeps track of the kind of transaction (deposit, withdrawal, payments etc.) as well as the date and amount of the transaction. Each transaction type will require its own parameters. The following diagram shows how BankAccounts and Transactions are related. An instance of DepositTransaction represents a deposit; a WithdrawalTransaction represents a withdrawal (the triangle on the diagram indicates inheritance). Inheritance for the PhoneBillPaymentTransaction, CheckTransaction etc. is not shown - you must decide where to put this class.  All transactions must have  have the fields date and amount at a minimum. The date field should contain the time of the transaction and should be automatically calculated.
 
@@ -14,7 +14,7 @@ The object model for our banking system must include transaction objects. A tran
 The template project (gradle Java) is available under the src folder.  We recommend that you use Quarkus or Spring(boot), Junit, JPA as the primary choices for your implementation.
 
 ## Task 1: Implement and test the model
-These transaction objects will be used both to make financial requests of a BankAccount and to keep a record of those requests. The following Unit test segment indicates how transactions will be used on the service side:
+These transaction objects will be used both to make financial requests of a BankAccount and to keep a record of those requests. The following Unit test segment indicates how transactions will be used on the bankAccountService side:
 
     BankAccount bankAccount = new BankAccount("Jim", 12345);
     bankAccount.post(new DepositTransaction(1000));

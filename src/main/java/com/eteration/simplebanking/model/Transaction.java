@@ -1,13 +1,14 @@
 package com.eteration.simplebanking.model;
 
 import com.eteration.simplebanking.exception.InsufficientBalanceException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "TRANSACTION")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
 public abstract class Transaction {
@@ -27,6 +28,7 @@ public abstract class Transaction {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_number")
+    @JsonIgnore
     private BankAccount bankAccount;
 
     // 🔧 Jackson bu ctor'u kullanır; approvalCode ve date boş kalmasın diye burada üretiyoruz
@@ -56,8 +58,10 @@ public abstract class Transaction {
     public Instant getDate() { return date; }
     public double getAmount() { return amount; }
     public String getApprovalCode() { return approvalCode; }
-    public BankAccount getAccount() { return bankAccount; }
-    public void setAccount(BankAccount bankAccount) { this.bankAccount = bankAccount; }
+    public BankAccount getBankAccount() { return bankAccount; }
+    public void setBankAccount(BankAccount bankAccount) { this.bankAccount = bankAccount; }
+
+
 
     @Override
     public String toString() {

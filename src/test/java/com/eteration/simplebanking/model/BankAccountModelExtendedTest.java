@@ -1,7 +1,6 @@
-package com.eteration.simplebanking;
+package com.eteration.simplebanking.model;
 
 import com.eteration.simplebanking.exception.InsufficientBalanceException;
-import com.eteration.simplebanking.model.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -64,7 +63,7 @@ public class BankAccountModelExtendedTest {
     void post_bill_payment_polymorphism() throws Exception {
         BankAccount a = new BankAccount("X", "A8");
         a.deposit(200);
-        a.post(new BillPaymentTransaction("Vodafone", 96.50));
+        a.post(new BillPaymentTransaction("Vodafone", 96.50,"09585985441"));
         assertEquals(103.5, a.getBalance(), 1e-9);
         assertEquals(1, a.getTransactions().stream().filter(t -> t instanceof BillPaymentTransaction).count());
     }
@@ -82,7 +81,7 @@ public class BankAccountModelExtendedTest {
         BankAccount a = new BankAccount("X", "A9");
         a.post(new DepositTransaction(1000));
         a.post(new WithdrawalTransaction(200));
-        a.post(new BillPaymentTransaction("Payee", 50));
+        a.post(new BillPaymentTransaction("Payee", 50,"095697848152"));
         a.post(new DepositTransaction(25));
         assertEquals(775, a.getBalance(), 1e-9);
         assertEquals(4, a.getTransactions().size());
