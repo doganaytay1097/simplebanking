@@ -25,7 +25,7 @@ public class BankAccount {
     @Column(nullable = false)
     private Instant createDate;
 
-    @OneToMany(mappedBy = "bankAccount", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "BANK_ACCOUNT", cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.EAGER)
     private List<Transaction> transactions = new ArrayList<>();
 
     protected BankAccount() { }
